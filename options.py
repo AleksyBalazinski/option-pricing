@@ -19,8 +19,7 @@ class EuropeanOption(Option):
         stock_tree = model.generate_stock_tree()
         N = model.N
         opt_tree = np.zeros(shape=(N + 1, N + 1))
-        for i in range(N + 1):
-            opt_tree[i, N] = self.payoff(stock_tree[i, N])
+        opt_tree[:, N] = self.payoff(stock_tree[:, N])
 
         for t in range(N - 1, -1, -1):
             for i in range(t + 1):
@@ -40,8 +39,7 @@ class AmericanOption(Option):
         stock_tree = model.generate_stock_tree()
         N = model.N
         opt_tree = np.zeros(shape=(N + 1, N + 1))
-        for i in range(N + 1):
-            opt_tree[i, N] = self.payoff(stock_tree[i, N])
+        opt_tree[:, N] = self.payoff(stock_tree[:, N])
 
         for t in range(N - 1, -1, -1):
             for i in range(t + 1):
@@ -59,7 +57,7 @@ class AmericanCall(AmericanOption):
         self.K = K
 
     def payoff(self, S):
-        return max(S - self.K, 0)
+        return np.maximum(S - self.K, 0)
 
 
 class AmericanPut(AmericanOption):
@@ -67,7 +65,7 @@ class AmericanPut(AmericanOption):
         self.K = K
 
     def payoff(self, S):
-        return max(self.K - S, 0)
+        return np.maximum(self.K - S, 0)
 
 
 class EuropeanCall(EuropeanOption):
@@ -75,7 +73,7 @@ class EuropeanCall(EuropeanOption):
         self.K = K
 
     def payoff(self, S):
-        return max(S - self.K, 0)
+        return np.maximum(S - self.K, 0)
 
 
 class EuropeanPut(EuropeanOption):
@@ -83,4 +81,4 @@ class EuropeanPut(EuropeanOption):
         self.K = K
 
     def payoff(self, S):
-        return max(self.K - S, 0)
+        return np.maximum(self.K - S, 0)

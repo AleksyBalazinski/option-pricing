@@ -11,8 +11,13 @@ class RecombinantTree:
     def get_start_idx(t):
         return t * (t + 1) // 2
 
-    @staticmethod
-    def get_flat_idx(i, t):
+    def get_flat_idx(self, i, t):
+        if not (0 <= t <= self.N):
+            raise IndexError(
+                f"Time step t={t} out of bounds for tree of depth {self.N}")
+        if not (0 <= i <= t):
+            raise IndexError(f"Node index i={i} must be between 0 and t={t}")
+
         return (t * (t + 1)) // 2 + i
 
     def get_step(self, t):

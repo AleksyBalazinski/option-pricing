@@ -1,4 +1,5 @@
 import numpy as np
+from recombinant_tree import RecombinantTree
 
 
 def get_down_factor(sigma, dt):
@@ -19,8 +20,8 @@ class BinomialModel:
         self.d = d
         self.p = (np.exp(r * dt) - self.d) / (self.u - self.d)
 
-    def generate_stock_tree(self):
-        tree = np.zeros(shape=(self.N + 1, self.N + 1))
+    def generate_stock_tree(self) -> RecombinantTree:
+        tree = RecombinantTree(self.N)
         for t in range(self.N + 1):
             for i in range(t + 1):
                 tree[i, t] = self.d**i * self.u**(t - i) * self.S0

@@ -1,6 +1,14 @@
 import numpy as np
 
 
+def get_down_factor(sigma, dt):
+    return np.exp(-1 * sigma * np.sqrt(dt))
+
+
+def get_up_factor(sigma, dt):
+    return np.exp(sigma * np.sqrt(dt))
+
+
 class BinomialModel:
     def __init__(self, S0, N, dt, u, d, r):
         self.S0 = S0

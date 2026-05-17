@@ -1,5 +1,6 @@
 import numpy as np
 from bin_model import BinomialModel
+from recombinant_tree import RecombinantTree
 
 
 class Option:
@@ -14,12 +15,12 @@ class EuropeanOption(Option):
     def payoff(self, S):
         raise NotImplementedError()
 
-    def price(self, model):
+    def price(self, model: BinomialModel):
         q = 1 - model.p
         stock_tree = model.generate_stock_tree()
         N = model.N
-        opt_tree = np.zeros(shape=(N + 1, N + 1))
-        opt_tree[:, N] = self.payoff(stock_tree[:, N])
+        opt_tree = RecombinantTree(N)
+        opt_tree.set_step(N, self.payoff(stock_tree.get_step(N)))
 
         for t in range(N - 1, -1, -1):
             for i in range(t + 1):
@@ -34,12 +35,12 @@ class AmericanOption(Option):
     def payoff(self, S):
         raise NotImplementedError()
 
-    def price(self, model):
+    def price(self, model: BinomialModel):
         q = 1 - model.p
         stock_tree = model.generate_stock_tree()
         N = model.N
-        opt_tree = np.zeros(shape=(N + 1, N + 1))
-        opt_tree[:, N] = self.payoff(stock_tree[:, N])
+        opt_tree = RecombinantTree(N)
+        opt_tree.set_step(N, self.payoff(stock_tree.get_step(N)))
 
         for t in range(N - 1, -1, -1):
             for i in range(t + 1):

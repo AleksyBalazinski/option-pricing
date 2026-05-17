@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
+from recombinant_tree import RecombinantTree
 
 
-def plot_tree(data_tree, title="Drzewo dwumianowe"):
+def plot_tree(data_tree: RecombinantTree, title="Drzewo dwumianowe"):
     """
     :param title: Tytuł wykresu
     :param data_tree: generated date tree from @generate_stock_tree function
@@ -9,8 +10,7 @@ def plot_tree(data_tree, title="Drzewo dwumianowe"):
     """
     plt.figure(figsize=(14, 8))
 
-    # TODO this will break sooner or later, create a tree class
-    N = data_tree.shape[0] - 1
+    N = data_tree.N
     for t in range(N):
         for i in range(t + 1):
             x = t

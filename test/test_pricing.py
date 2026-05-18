@@ -54,5 +54,35 @@ class TestEuropean(unittest.TestCase):
         self.assertAlmostEqual(lhs, rhs, delta=1e-5)
 
 
+class TestEuropeanHedging(unittest.TestCase):
+    def test_hedging_call(self):
+        bin_model = BinomialModel(S0=20, N=2, dt=0.25, u=1.1, d=0.9, r=0.12)
+        eur_call = EuropeanCall(K=21)
+
+        opt_tree, delta_tree, alpha_tree = eur_call.price_with_hedging(bin_model)
+        #stock_tree = bin_model.generate_stock_tree()
+
+        # wenzel A
+        delta_A = delta_tree[0, 0]
+        alpha_A = alpha_tree[0, 0]
+
+        self.assertAlmostEqual(delta_A, 0.506425, delta=1e-4)
+        self.assertAlmostEqual(alpha_A, -8.8462, delta=1e-2)
+
+        # wezel B
+        delta_B = delta_tree[0, 1]
+        alpha_B = alpha_tree[0, 1]
+
+        self.assertAlmostEqual(delta_B, 0.727273, delta=1e-3)
+        self.assertAlmostEqual(alpha_B, -13.97441, delta=1e-5)
+
+        # wezel C
+        delta_C = delta_tree[1, 1]
+        alpha_C = alpha_tree[1, 1]
+
+        self.assertAlmostEqual(delta_C, 0.0, delta=1e-7)
+        self.assertAlmostEqual(alpha_C, 0.0, delta=1e-7)
+
+
 if __name__ == "__main__":
     unittest.main()

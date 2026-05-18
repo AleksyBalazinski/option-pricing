@@ -52,6 +52,8 @@ class AmericanOption(Option):
 
         return opt_tree[0, 0]
 
+def adding (x,y):
+    return x+y
 
 class AmericanCall(AmericanOption):
     def __init__(self, K):

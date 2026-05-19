@@ -30,7 +30,7 @@ class EuropeanOption(Option):
 
         return opt_tree[0, 0]
 
-    # wyznaczenie dealta hedging -> delta aktywo i alfa gotówki
+    # wyznaczenie delta hedging -> delta aktywo i alfa gotówki
     def price_with_hedging(self, model: BinomialModel):
         stock_tree = model.generate_stock_tree()
         N = model.N
@@ -42,7 +42,7 @@ class EuropeanOption(Option):
         # Warunek końcowy
         opt_tree.set_step(N, self.payoff(stock_tree.get_step(N)))
 
-        # wyliczamy wstecz ceny hedingu dla każdego węzłą
+        # wyliczamy wstecz ceny hedgingu dla każdego węzłą
         for t in range(N - 1, -1, -1):
             for i in range(t + 1):
                 # ustalamy cene obligacji i wartość aktywa w danej chwili czasu
@@ -51,7 +51,7 @@ class EuropeanOption(Option):
                 S_up = stock_tree[i, t + 1]
                 S_down = stock_tree[i + 1, t + 1]
 
-                # Wyliczanie delty i alfy -> rozwiązanie ukłądu równań z wykładu
+                # Wyliczanie delty i alfy -> rozwiązanie układu równań z wykładu
                 delta = (V_up - V_down) / (S_up - S_down)
                 df = np.exp(-model.r * model.dt)
                 alpha = df * (V_up - delta * S_up)
@@ -59,11 +59,10 @@ class EuropeanOption(Option):
                 delta_tree[i, t] = delta
                 alpha_tree[i, t] = alpha
 
-                # wyliczenie kosztu budowy porfela -> czy zgadza się z protfolio_vla w ujpyterze
+                # wyliczenie kosztu budowy porfela -> czy zgadza się z protfolio_vla w jupiterze
                 opt_tree[i, t] = delta * stock_tree[i, t] + alpha
 
         return opt_tree, delta_tree, alpha_tree
-
 
 
 class AmericanOption(Option):
@@ -86,7 +85,6 @@ class AmericanOption(Option):
                 opt_tree[i, t] = max(cont, exercise)
 
         return opt_tree[0, 0]
-
 
 
 class AmericanCall(AmericanOption):

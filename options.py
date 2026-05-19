@@ -1,8 +1,7 @@
 import numpy as np
 from bin_model import BinomialModel
 from recombinant_tree import RecombinantTree
-import pandas as pd
-import ipywidgets as widgets
+
 
 class Option:
     def payoff(self, S):

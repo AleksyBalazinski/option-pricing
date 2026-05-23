@@ -15,7 +15,7 @@ class EuropeanOption(Option):
     def payoff(self, S):
         raise NotImplementedError()
 
-    def price(self, model: BinomialModel):
+    def calc_opt_tree(self, model: BinomialModel):
         q = 1 - model.p
         stock_tree = model.generate_stock_tree()
         N = model.N
@@ -28,39 +28,32 @@ class EuropeanOption(Option):
                     opt_tree[i, t + 1] + q * opt_tree[i + 1, t + 1]
                 opt_tree[i, t] = np.exp(-1 * model.r * model.dt) * expected
 
+        return opt_tree
+
+    def price(self, model: BinomialModel):
+        opt_tree = self.calc_opt_tree(model)
+
         return opt_tree[0, 0]
 
-    # wyznaczenie delta hedging -> delta aktywo i alfa gotówki
     def price_with_hedging(self, model: BinomialModel):
-        stock_tree = model.generate_stock_tree()
         N = model.N
-
-        opt_tree = RecombinantTree(N)
         delta_tree = RecombinantTree(N - 1)
         alpha_tree = RecombinantTree(N - 1)
 
-        # Warunek końcowy
-        opt_tree.set_step(N, self.payoff(stock_tree.get_step(N)))
-
-        # wyliczamy wstecz ceny hedgingu dla każdego węzłą
+        opt_tree = self.calc_opt_tree(model)
+        stock_tree = model.generate_stock_tree()
         for t in range(N - 1, -1, -1):
             for i in range(t + 1):
-                # ustalamy cene obligacji i wartość aktywa w danej chwili czasu
                 V_up = opt_tree[i, t + 1]
                 V_down = opt_tree[i + 1, t + 1]
                 S_up = stock_tree[i, t + 1]
                 S_down = stock_tree[i + 1, t + 1]
 
-                # Wyliczanie delty i alfy -> rozwiązanie układu równań z wykładu
                 delta = (V_up - V_down) / (S_up - S_down)
-                df = np.exp(-model.r * model.dt)
-                alpha = df * (V_up - delta * S_up)
+                alpha = opt_tree[i, t] - delta * stock_tree[i, t]
 
-                delta_tree[i, t] = delta
                 alpha_tree[i, t] = alpha
-
-                # wyliczenie kosztu budowy porfela -> czy zgadza się z protfolio_vla w jupiterze
-                opt_tree[i, t] = delta * stock_tree[i, t] + alpha
+                delta_tree[i, t] = delta
 
         return opt_tree, delta_tree, alpha_tree
 

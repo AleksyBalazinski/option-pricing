@@ -59,10 +59,9 @@ class TestEuropeanHedging(unittest.TestCase):
         bin_model = BinomialModel(S0=20, N=2, dt=0.25, u=1.1, d=0.9, r=0.12)
         eur_call = EuropeanCall(K=21)
 
-        opt_tree, delta_tree, alpha_tree = eur_call.price_with_hedging(bin_model)
-        #stock_tree = bin_model.generate_stock_tree()
+        delta_tree, alpha_tree = eur_call.price_with_hedging(bin_model)
 
-        # wenzel A
+        # wezel A
         delta_A = delta_tree[0, 0]
         alpha_A = alpha_tree[0, 0]
 

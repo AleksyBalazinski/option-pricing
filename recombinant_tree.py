@@ -2,10 +2,11 @@ import numpy as np
 
 
 class RecombinantTree:
-    def __init__(self, N):
+    def __init__(self, N, dtype=np.float32):
         self.N = N
         self.length = self.get_start_idx(N + 1)
-        self.data = np.zeros(self.length)
+        self.data = np.zeros(self.length, dtype)
+        self.dtype = dtype
 
     @staticmethod
     def get_start_idx(t):

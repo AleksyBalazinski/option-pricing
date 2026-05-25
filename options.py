@@ -113,6 +113,44 @@ class AmericanOption(Option):
     def payoff(self, S):
         raise NotImplementedError()
 
+    def analyze_exercise_nodes(self, model: BinomialModel):
+        N = model.N
+        p = model.p
+        q = 1 - p
+        disc = np.exp(-model.r * model.dt)
+
+        exercise_tree = RecombinantTree(N, dtype=np.bool)
+
+        stock_tree = model.generate_stock_tree()
+
+        ST = stock_tree.get_step(N)
+        final_payoff = self.payoff(ST)
+        opt_values = final_payoff.copy()
+
+        # Mark terminal nodes as True if they expire in-the-money
+        exercise_tree.set_step(N, final_payoff > 0)
+
+        for t in range(N - 1, -1, -1):
+            S_t = stock_tree.get_step(t)
+            exercise_val = self.payoff(S_t)
+
+            continuation_val = disc * (
+                p * opt_values[:t + 1] +
+                q * opt_values[1:t + 2]
+            )
+
+            # A node is optimal to exercise if:
+            # 1. Exercise value is >= continuation value
+            # 2. It is actually in-the-money (exercise_val > 0)
+            is_optimal_exercise = (
+                exercise_val >= continuation_val) & (exercise_val > 0)
+
+            exercise_tree.set_step(t, is_optimal_exercise)
+
+            opt_values = np.maximum(exercise_val, continuation_val)
+
+        return exercise_tree
+
     def calc_opt_tree(self, model: BinomialModel):
         q = 1 - model.p
         stock_tree = model.generate_stock_tree()

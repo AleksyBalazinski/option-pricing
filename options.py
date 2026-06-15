@@ -256,3 +256,21 @@ class EuropeanPut(EuropeanOption):
 
     def payoff(self, S):
         return np.maximum(self.K - S, 0)
+
+
+class Ex6Option(EuropeanOption):
+    def __init__(self, K, A):
+        self.K = K
+        self.A = A
+
+    def payoff(self, S):
+        return np.where(S <= self.K, 0, S - self.K - self.A)
+
+
+class Ex7Option(EuropeanOption):
+    def __init__(self, K, alpha):
+        self.K = K
+        self.alpha = alpha
+
+    def payoff(self, S):
+        return np.where(S <= self.K, 0, self.alpha * S - self.K)
